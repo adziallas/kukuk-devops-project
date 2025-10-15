@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kukuk Technology Future GmbH</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 2rem;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        .welcome-message {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .status {
+            background: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            border-left: 4px solid #667eea;
+        }
+        .endpoint {
+            background: #e3f2fd;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 0.5rem 0;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Kukuk Technology Future GmbH</h1>
+        <div class="welcome-message">
+            Willkommen! Dein kukuk-frontend läuft erfolgreich auf Port 8081
+        </div>
+        
+        <div class="status">
+            ✅ Frontend Status: Online
+        </div>
+        
+        <div class="info">
+            <h3>📡 Verfügbare Endpoints:</h3>
+            <div class="endpoint">Frontend: http://localhost:8081</div>
+            <div class="endpoint">Backend: http://localhost:8080</div>
+            <div class="endpoint">Health Check: http://localhost:8081/health</div>
+        </div>
+        
+        <div class="info">
+            <h3>🔧 DevOps Pipeline:</h3>
+            <p>Dieses Projekt wird über Jenkins CI/CD automatisiert deployed und läuft in Kubernetes.</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple health check
+        fetch('/health')
+            .then(response => response.text())
+            .then(data => console.log('Health check:', data))
+            .catch(error => console.log('Health check failed:', error));
+    </script>
+</body>
+</html>

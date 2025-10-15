@@ -1,0 +1,17 @@
+{
+  "name": "kukuk-frontend",
+  "version": "1.0.0",
+  "description": "Kukuk Technology Future GmbH - Frontend Application",
+  "scripts": {
+    "start": "http-server -p 8081 -o",
+    "build": "echo Building frontend...",
+    "test": "jest",
+    "dev": "http-server -p 8081 -o"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}

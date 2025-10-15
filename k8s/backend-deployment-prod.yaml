@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kukuk-backend
+  namespace: prod
+  labels:
+    app: kukuk-backend
+    environment: prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kukuk-backend
+  template:
+    metadata:
+      labels:
+        app: kukuk-backend
+        environment: prod
+    spec:
+      containers:
+      - name: kukuk-backend
+        image: andziallas/kukuk-backend:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
+        - name: SERVER_PORT
+          value: "8080"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: kukuk-db-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kukuk-db-secret
+              key: password
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
