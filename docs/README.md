@@ -1,8 +1,14 @@
-# 🚀 Kukuk Technology Future GmbH - DevOps Abschlussprojekt
+
+#####
+BITTE BEACHTEN !!!!
+DIENT NICHT ALS ECHTE VERWENDUNG NUR ALS DEMOVERSION GEDACHT DA ES SICH UM EIN ABSCHLUSSPROJEKT HANDELT ZUM DEVOPS ENGINEER!!!!!
+
+
+# Kukuk Technology Future GmbH - DevOps Abschlussprojekt
 
 Dieses Projekt implementiert eine vollständige CI/CD-Pipeline für eine Microservice-Anwendung mit Spring Boot Backend und JavaScript Frontend, automatisiertem Deployment über Jenkins und Kubernetes.
 
-## 📋 Projektübersicht
+## Projektübersicht
 
 Das Projekt besteht aus:
 - **Backend**: Spring Boot Anwendung (Java 17, Maven)
@@ -11,7 +17,7 @@ Das Projekt besteht aus:
 - **Container**: Docker Images für beide Services
 - **Orchestrierung**: Kubernetes Deployments für dev und prod Umgebungen
 
-## 🏗️ Projektstruktur
+## Projektstruktur
 
 ```
 kukuk-devops-project/
@@ -49,7 +55,7 @@ kukuk-devops-project/
     └── README.md
 ```
 
-## 🔧 Technische Konfiguration
+## Technische Konfiguration
 
 ### Spring Boot Backend
 
@@ -97,7 +103,7 @@ kukuk-devops-project/
 - `GET /` - Hauptseite mit Willkommensnachricht
 - `GET /health` - Health Check
 
-## 🚀 CI/CD Pipeline
+## CI/CD Pipeline
 
 ### Jenkins Pipeline Stages
 
@@ -123,7 +129,7 @@ kukuk-devops-project/
 - **Backend**: `andziallas/kukuk-backend:latest`
 - **Frontend**: `andziallas/kukuk-frontend:latest`
 
-## ☸️ Kubernetes Deployment
+## Kubernetes Deployment
 
 ### Namespaces
 
@@ -150,7 +156,7 @@ kukuk-devops-project/
 - **Dev**: `kukuk-dev.local`
 - **Prod**: `kukuk-prod.local`
 
-## 🛠️ Deployment-Schritte
+## Deployment-Schritte
 
 ### 1. Lokale Entwicklung
 
@@ -206,7 +212,7 @@ kubectl apply -f k8s/frontend-service.yaml
 3. Pipeline mit Jenkinsfile erstellen
 4. Build mit gewünschten Parametern starten
 
-## 🔐 Credentials
+## Credentials
 
 ### Docker Hub
 - **Username**: `andziallas`
@@ -216,7 +222,7 @@ kubectl apply -f k8s/frontend-service.yaml
 - **Username**: `adziallas`
 - **Token**: `[GITHUB_TOKEN]` (in Jenkins Credentials hinterlegt)
 
-## 📊 Monitoring & Health Checks
+## Monitoring & Health Checks
 
 ### Backend Health Endpoints
 - `/health` - Basic health check
@@ -229,25 +235,18 @@ kubectl apply -f k8s/frontend-service.yaml
 - **Liveness Probe**: Überprüft ob Container läuft
 - **Readiness Probe**: Überprüft ob Container bereit ist
 
-## 🎯 Projektziele erreicht
+## Projektziele erreicht
 
-✅ **Projektstruktur**: Saubere Trennung in /backend, /frontend, /k8s, /jenkins, /docs  
-✅ **Spring Boot Konfiguration**: application.properties für dev/prod mit Maven-Profilen  
-✅ **CI/CD Pipeline**: Vollständiges Jenkinsfile mit allen erforderlichen Stages  
-✅ **Kubernetes**: Deployments, Services, Namespaces für dev und prod  
-✅ **Docker**: Multi-stage Builds für Backend und Frontend  
-✅ **Dokumentation**: Umfassende README mit allen Konfigurationsdetails  
-
-## 🚀 Nächste Schritte
-
-1. **Git Repository erstellen** und Code hochladen
-2. **Jenkins konfigurieren** mit den bereitgestellten Credentials
-3. **Kubernetes Cluster** mit kubeconfig verbinden
-4. **Pipeline testen** mit dev Environment
-5. **Production Deployment** nach erfolgreichem Test
+ **Projektstruktur**: Saubere Trennung in /backend, /frontend, /k8s, /jenkins, /docs  
+  **Spring Boot Konfiguration**: application.properties für dev/prod mit Maven-Profilen  
+  **CI/CD Pipeline**: Vollständiges Jenkinsfile mit allen erforderlichen Stages  
+ **Kubernetes**: Deployments, Services, Namespaces für dev und prod  
+ **Docker**: Multi-stage Builds für Backend und Frontend  
+ **Dokumentation**: Umfassende README mit allen Konfigurationsdetails  
 
 ---
 
 **Entwickelt für Kukuk Technology Future GmbH**  
 **DevOps Engineering Abschlussprojekt**  
 **Datum**: Oktober 2025
+
