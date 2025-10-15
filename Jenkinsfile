@@ -7,7 +7,7 @@ pipeline {
         DOCKER_IMAGE_BACKEND = "${DOCKER_USERNAME}/kukuk-backend"
         DOCKER_IMAGE_FRONTEND = "${DOCKER_USERNAME}/kukuk-frontend"
         KUBECONFIG = credentials('kubeconfig')
-        GITHUB_TOKEN = credentials('github-token')
+        GITHUB_TOKEN = credentials('git-push-token')
     }
     
     parameters {
@@ -133,7 +133,7 @@ pipeline {
         stage('Docker Push') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh """
                             echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
                             docker push ${BACKEND_IMAGE}
