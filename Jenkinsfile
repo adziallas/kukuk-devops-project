@@ -7,15 +7,12 @@ pipeline {
     }
 
     tools {
-        git 'Default' // Stelle sicher, dass Git unter "Global Tool Configuration" als "Default" konfiguriert ist
+        git 'Default'
     }
 
     environment {
-        GIT_CREDENTIALS = credentials('git-push-token')           // GitHub: adziallas
-        DOCKER_CREDENTIALS = credentials('docker-hub-token')      // DockerHub: andziallas
-        JENKINS_CREDENTIALS = credentials('jenkins')              // Jenkins: andziallas
-        BACKEND_IMAGE = "andziallas/kukuk-backend:${params.ENVIRONMENT}"
-        FRONTEND_IMAGE = "andziallas/kukuk-frontend:${params.ENVIRONMENT}"
+        BACKEND_IMAGE = "kukuk-backend:${params.ENVIRONMENT}"
+        FRONTEND_IMAGE = "kukuk-frontend:${params.ENVIRONMENT}"
     }
 
     stages {
@@ -71,6 +68,12 @@ pipeline {
             }
         }
 
+        stage('Configure Minikube Docker') {
+            steps {
+                sh 'eval $(minikube docker-env)'
+            }
+        }
+
         stage('Docker Build') {
             parallel {
                 stage('Backend Image') {
@@ -90,61 +93,23 @@ pipeline {
             }
         }
 
-        stage('Docker Push') {
+        stage('Deploy to Minikube') {
             steps {
-                withDockerRegistry([credentialsId: 'docker-hub-token', url: '']) {
-                    sh "docker push ${env.BACKEND_IMAGE}"
-                    sh "docker push ${env.FRONTEND_IMAGE}"
-                }
-            }
-        }
-
-        stage('Deploy to Dev') {
-            when {
-                expression { return params.ENVIRONMENT == 'dev' }
-            }
-            steps {
-                withCredentials([file(credentialsId: 'jenkins', variable: 'KUBECONFIG')]) {
-                    sh '''
-                        kubectl apply -f k8s/namespaces.yaml
-                        kubectl apply -f k8s/backend-deployment-dev.yaml
-                        kubectl apply -f k8s/frontend-deployment-dev.yaml
-                        kubectl apply -f k8s/backend-service.yaml
-                        kubectl apply -f k8s/frontend-service.yaml
-                    '''
-                }
-            }
-        }
-
-        stage('Manual Approval') {
-            when {
-                expression { return params.ENVIRONMENT == 'prod' }
-            }
-            steps {
-                input message: 'Deploy to production?', ok: 'Proceed'
-            }
-        }
-
-        stage('Deploy to Prod') {
-            when {
-                expression { return params.ENVIRONMENT == 'prod' }
-            }
-            steps {
-                withCredentials([file(credentialsId: 'jenkins', variable: 'KUBECONFIG')]) {
-                    sh '''
-                        kubectl apply -f k8s/backend-deployment-prod.yaml
-                        kubectl apply -f k8s/frontend-deployment-prod.yaml
-                        kubectl apply -f k8s/backend-service.yaml
-                        kubectl apply -f k8s/frontend-service.yaml
-                    '''
-                }
+                sh '''
+                    kubectl apply -f k8s/namespaces.yaml || true
+                    kubectl apply -f k8s/backend-deployment-${ENVIRONMENT}.yaml
+                    kubectl apply -f k8s/frontend-deployment-${ENVIRONMENT}.yaml
+                    kubectl apply -f k8s/backend-service.yaml
+                    kubectl apply -f k8s/frontend-service.yaml
+                '''
             }
         }
 
         stage('Health Check') {
             steps {
                 sh '''
-                    curl -f http://kukuk-${params.ENVIRONMENT}.local/health || echo "Health check failed"
+                    kubectl get pods -n kukuk || echo "Namespace not found"
+                    kubectl get svc -n kukuk || echo "Services not found"
                 '''
             }
         }
