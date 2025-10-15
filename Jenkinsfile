@@ -11,17 +11,24 @@ pipeline {
     }
 
     environment {
-        DOCKER_CREDENTIALS = credentials('docker-hub-credentials')
-        GITHUB_TOKEN = credentials('github-token')
-        KUBECONFIG_CREDENTIALS = credentials('kubeconfig')
-        BACKEND_IMAGE = "adziallas/kukuk-backend:${params.ENVIRONMENT}"
-        FRONTEND_IMAGE = "adziallas/kukuk-frontend:${params.ENVIRONMENT}"
+        GIT_CREDENTIALS = credentials('git-push-token')           // GitHub: adziallas
+        DOCKER_CREDENTIALS = credentials('docker-hub-token')      // DockerHub: andziallas
+        JENKINS_CREDENTIALS = credentials('jenkins')              // Jenkins: andziallas
+        BACKEND_IMAGE = "andziallas/kukuk-backend:${params.ENVIRONMENT}"
+        FRONTEND_IMAGE = "andziallas/kukuk-frontend:${params.ENVIRONMENT}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/adziallas/kukuk-devops-project.git',
+                        credentialsId: 'git-push-token'
+                    ]]
+                ])
             }
         }
 
@@ -85,7 +92,7 @@ pipeline {
 
         stage('Docker Push') {
             steps {
-                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
+                withDockerRegistry([credentialsId: 'docker-hub-token', url: '']) {
                     sh "docker push ${env.BACKEND_IMAGE}"
                     sh "docker push ${env.FRONTEND_IMAGE}"
                 }
@@ -97,7 +104,7 @@ pipeline {
                 expression { return params.ENVIRONMENT == 'dev' }
             }
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                withCredentials([file(credentialsId: 'jenkins', variable: 'KUBECONFIG')]) {
                     sh '''
                         kubectl apply -f k8s/namespaces.yaml
                         kubectl apply -f k8s/backend-deployment-dev.yaml
@@ -123,7 +130,7 @@ pipeline {
                 expression { return params.ENVIRONMENT == 'prod' }
             }
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                withCredentials([file(credentialsId: 'jenkins', variable: 'KUBECONFIG')]) {
                     sh '''
                         kubectl apply -f k8s/backend-deployment-prod.yaml
                         kubectl apply -f k8s/frontend-deployment-prod.yaml
