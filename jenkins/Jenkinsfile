@@ -90,6 +90,11 @@ pipeline {
                     """
                 }
             }
+            post {
+                always {
+                    publishTestResults testResultsPattern: 'frontend/coverage/lcov.info'
+                }
+            }
         }
         
         stage('Docker Build') {

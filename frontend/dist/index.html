@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="de"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kukuk Technology Future GmbH</title>
+    <style>body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+}
+
+.container {
+  text-align: center;
+  background: #fff;
+  border-radius: 15px;
+  max-width: 600px;
+  margin: 2rem;
+  padding: 3rem;
+  box-shadow: 0 20px 40px #0000001a;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+}
+
+.welcome-message {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.status {
+  color: #fff;
+  background: #4caf50;
+  border-radius: 25px;
+  margin: 1rem 0;
+  padding: 1rem 2rem;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.info {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  border-radius: 10px;
+  margin-top: 2rem;
+  padding: 1.5rem;
+}
+
+.endpoint {
+  background: #e3f2fd;
+  border-radius: 5px;
+  margin: .5rem 0;
+  padding: .5rem 1rem;
+  font-family: monospace;
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Kukuk Technology Future GmbH</h1>
+        <div class="welcome-message">
+            Willkommen! Dein kukuk-frontend läuft erfolgreich auf Port 8081
+        </div>
+        
+        <div class="status">
+            ✅ Frontend Status: Online
+        </div>
+        
+        <div class="info">
+            <h3>📡 Verfügbare Endpoints:</h3>
+            <div class="endpoint">Frontend: http://localhost:8081</div>
+            <div class="endpoint">Backend: http://localhost:8080</div>
+            <div class="endpoint">Health Check: http://localhost:8081/health</div>
+        </div>
+        
+        <div class="info">
+            <h3>🔧 DevOps Pipeline:</h3>
+            <p>Dieses Projekt wird über Jenkins CI/CD automatisiert deployed und läuft in Kubernetes.</p>
+        </div>
+    </div>
+
+    <script>// Simple health check
+fetch('/health').then((response)=>response.text()).then((data)=>console.log('Health check:', data)).catch((error)=>console.log('Health check failed:', error));
+
+</script>
+
+
+<script src="/frontend.3464ddca.js"></script></body></html>

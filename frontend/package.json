@@ -3,15 +3,24 @@
   "version": "1.0.0",
   "description": "Kukuk Technology Future GmbH - Frontend Application",
   "scripts": {
-    "start": "http-server -p 8081 -o",
-    "build": "echo Building frontend...",
+    "start": "parcel serve index.html --port 8081 --open",
+    "build": "parcel build index.html --dist-dir dist",
     "test": "jest",
-    "dev": "http-server -p 8081 -o"
+    "dev": "parcel serve index.html --port 8081 --open",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
-    "http-server": "^14.1.1"
+    "parcel": "^2.10.0"
   },
   "devDependencies": {
-    "jest": "^29.0.0"
-  }
+    "@babel/preset-env": "^7.23.0",
+    "babel-jest": "^29.0.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^30.2.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
 }
