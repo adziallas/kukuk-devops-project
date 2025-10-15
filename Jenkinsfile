@@ -6,12 +6,16 @@ pipeline {
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests')
     }
 
+    tools {
+        git 'Default' // Stelle sicher, dass Git unter "Global Tool Configuration" als "Default" konfiguriert ist
+    }
+
     environment {
         DOCKER_CREDENTIALS = credentials('docker-hub-credentials')
         GITHUB_TOKEN = credentials('github-token')
         KUBECONFIG_CREDENTIALS = credentials('kubeconfig')
-        BACKEND_IMAGE = "andziallas/kukuk-backend:latest"
-        FRONTEND_IMAGE = "andziallas/kukuk-frontend:latest"
+        BACKEND_IMAGE = "adziallas/kukuk-backend:${params.ENVIRONMENT}"
+        FRONTEND_IMAGE = "adziallas/kukuk-frontend:${params.ENVIRONMENT}"
     }
 
     stages {
