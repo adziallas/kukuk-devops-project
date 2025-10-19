@@ -10,16 +10,8 @@ pipeline {
   }
 
   parameters {
-    choice(
-      name: 'ENVIRONMENT',
-      choices: ['dev', 'prod'],
-      description: 'Target environment for build'
-    )
-    booleanParam(
-      name: 'SKIP_TESTS',
-      defaultValue: false,
-      description: 'Skip running tests'
-    )
+    choice(name: 'ENVIRONMENT', choices: ['dev', 'prod'], description: 'Target environment')
+    booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests')
   }
 
   stages {
@@ -51,9 +43,7 @@ pipeline {
     }
 
     stage('Test Backend') {
-      when {
-        not { params.SKIP_TESTS }
-      }
+      when { not { params.SKIP_TESTS } }
       steps {
         dir('backend') {
           sh "mvn test -P${params.ENVIRONMENT}"
@@ -67,9 +57,7 @@ pipeline {
     }
 
     stage('Test Frontend') {
-      when {
-        not { params.SKIP_TESTS }
-      }
+      when { not { params.SKIP_TESTS } }
       steps {
         dir('frontend') {
           sh "npm test -- --coverage --watchAll=false"
@@ -160,10 +148,10 @@ pipeline {
       """
     }
     success {
-      echo 'Pipeline erfolgreich abgeschlossen!'
+      echo 'Pipeline erfolgreich abgeschlossen'
     }
     failure {
-      echo 'Pipeline fehlgeschlagen!'
+      echo 'Pipeline fehlgeschlagen'
     }
     cleanup {
       cleanWs()
