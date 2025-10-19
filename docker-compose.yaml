@@ -5,7 +5,7 @@ services:
     container_name: kukuk-backend
     image: andziallas/kukuk-backend:latest
     ports:
-      - "8080:8080"
+      - "0:8080"
     restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: ${ENVIRONMENT}
