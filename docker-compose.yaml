@@ -2,11 +2,25 @@ version: '3.8'
 
 services:
   backend:
+    container_name: kukuk-backend
     image: andziallas/kukuk-backend:latest
     ports:
       - "8080:8080"
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${ENVIRONMENT}
+    networks:
+      - kukuk-net
 
   frontend:
+    container_name: kukuk-frontend
     image: andziallas/kukuk-frontend:latest
     ports:
-      - "3000:3000"
+      - "8081:8081"
+    restart: unless-stopped
+    networks:
+      - kukuk-net
+
+networks:
+  kukuk-net:
+    driver: bridge

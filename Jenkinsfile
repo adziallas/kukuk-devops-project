@@ -78,14 +78,28 @@ pipeline {
       }
     }
 
+    stage('System Port Cleanup') {
+      steps {
+        sh '''
+          echo "Prüfe Systemprozesse auf Port 8080..."
+          PID=$(lsof -ti :8080)
+          if [ -n "$PID" ]; then
+            echo "Beende Prozess $PID auf Port 8080"
+            kill -9 $PID || true
+          fi
+        '''
+      }
+    }
+
     stage('Docker Port Cleanup') {
       steps {
-        echo '🔧 Bereinige blockierte Ports 8080 und 8081...'
+        echo 'Bereinige blockierte Docker-Container auf Ports 8080 und 8081...'
         sh '''
-          docker ps --format '{{.ID}} {{.Ports}}' | while read id ports; do
-            if echo "$ports" | grep -q '8080\\|8081'; then
-              echo "Stoppe Container $id mit Ports: $ports"
-              docker stop $id || true
+          docker ps -a --format '{{.ID}} {{.Ports}}' | while read id ports; do
+            if [ -n "$ports" ] && echo "$ports" | grep -q '8080\\|8081'; then
+              echo "Stoppe und entferne Container $id mit Ports: $ports"
+              docker stop "$id" || true
+              docker rm "$id" || true
             fi
           done
         '''
@@ -100,6 +114,8 @@ pipeline {
             echo "Fehlende Datei: $COMPOSE_FILE"
             exit 1
           fi
+
+          docker network prune -f || true
 
           if command -v docker compose > /dev/null; then
             docker compose -f $COMPOSE_FILE down || true
@@ -134,10 +150,10 @@ pipeline {
 
   post {
     success {
-      echo '✅ Build, Push und Deployment erfolgreich abgeschlossen.'
+      echo 'Build, Push und Deployment erfolgreich abgeschlossen.'
     }
     failure {
-      echo '❌ Pipeline fehlgeschlagen.'
+      echo 'Pipeline fehlgeschlagen.'
     }
   }
 }
