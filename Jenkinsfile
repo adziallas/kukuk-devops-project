@@ -74,29 +74,6 @@ pipeline {
     stage('Docker Build & Push') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_TOKEN', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
           sh 'docker build -t $DOCKER_IMAGE_BACKEND:latest ./backend'
-          sh 'docker build -t $DOCKER_IMAGE_FRONTEND:latest ./frontend'
-          sh 'docker push $DOCKER_IMAGE_BACKEND:latest'
-          sh 'docker push $DOCKER_IMAGE_FRONTEND:latest'
-        }
-      }
-    }
-
-    stage('Docker Compose Up') {
-      steps {
-        dir('docker') {
-          sh 'docker-compose down || true'
-          sh 'docker-compose up -d'
-        }
-      }
-    }
-
-    stage('Health Check') {
-      steps {
-        sh 'curl -sSf http://localhost:3000 || echo "Frontend nicht erreichbar"'
-        sh 'curl -sSf http://localhost:8080/api/health || echo "Backend nicht erreichbar"'
-      }
-    }
-  }
-}
+          sh 'docker build
