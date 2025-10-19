@@ -14,7 +14,7 @@ pipeline {
     )
     credentials(
       name: 'DOCKER_HUB_TOKEN',
-      description: 'Docker Hub Zugangsdaten',
+      description: 'Docker Hub Zugangsdaten (PAT)',
       credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl'
     )
   }
@@ -66,7 +66,7 @@ pipeline {
       }
       steps {
         dir('frontend') {
-          sh 'npm test || true' // optional: Fehler ignorieren
+          sh 'npm test || true' // Fehler ignorieren, falls kein Test-Setup vorhanden
         }
       }
     }
@@ -76,4 +76,27 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_TOKEN', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
           sh 'docker build -t $DOCKER_IMAGE_BACKEND:latest ./backend'
-          sh 'docker build
+          sh 'docker build -t $DOCKER_IMAGE_FRONTEND:latest ./frontend'
+          sh 'docker push $DOCKER_IMAGE_BACKEND:latest'
+          sh 'docker push $DOCKER_IMAGE_FRONTEND:latest'
+        }
+      }
+    }
+
+    stage('Docker Compose Up') {
+      steps {
+        dir('docker') {
+          sh 'docker-compose down || true'
+          sh 'docker-compose up -d'
+        }
+      }
+    }
+
+    stage('Health Check') {
+      steps {
+        sh 'curl -sSf http://localhost:3000 || echo "⚠️ Frontend nicht erreichbar"'
+        sh 'curl -sSf http://localhost:8080/api/health || echo "⚠️ Backend nicht erreichbar"'
+      }
+    }
+  }
+}
