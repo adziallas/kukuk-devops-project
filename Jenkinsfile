@@ -51,7 +51,7 @@ pipeline {
       }
       post {
         always {
-          publishTestResults testResultsPattern: 'backend/target/surefire-reports/*.xml'
+          junit 'backend/target/surefire-reports/*.xml'
         }
       }
     }
@@ -65,53 +65,31 @@ pipeline {
       }
       post {
         always {
-          publishTestResults testResultsPattern: 'frontend/coverage/lcov.info'
+          junit 'frontend/coverage/lcov.info'
         }
       }
     }
 
-    stage('Docker Build') {
-      parallel {
-        stage('Build Backend Image') {
-          steps {
-            dir('backend') {
-              script {
-                def backendImage = "${DOCKER_IMAGE_BACKEND}:${BUILD_TAG}"
-                sh """
-                  docker build -t ${backendImage} .
-                  docker tag ${backendImage} ${DOCKER_IMAGE_BACKEND}:latest
-                """
-                env.BACKEND_IMAGE = backendImage
-              }
-            }
-          }
-        }
-        stage('Build Frontend Image') {
-          steps {
-            dir('frontend') {
-              script {
-                def frontendImage = "${DOCKER_IMAGE_FRONTEND}:${BUILD_TAG}"
-                sh """
-                  docker build -t ${frontendImage} .
-                  docker tag ${frontendImage} ${DOCKER_IMAGE_FRONTEND}:latest
-                """
-                env.FRONTEND_IMAGE = frontendImage
-              }
-            }
-          }
-        }
-      }
-    }
-
-    stage('Docker Push') {
+    stage('Docker Build & Push') {
       steps {
         script {
+          def backendImage = "${DOCKER_IMAGE_BACKEND}:${BUILD_TAG}"
+          def frontendImage = "${DOCKER_IMAGE_FRONTEND}:${BUILD_TAG}"
+
+          sh """
+            docker build -t ${backendImage} backend
+            docker tag ${backendImage} ${DOCKER_IMAGE_BACKEND}:latest
+
+            docker build -t ${frontendImage} frontend
+            docker tag ${frontendImage} ${DOCKER_IMAGE_FRONTEND}:latest
+          """
+
           withCredentials([usernamePassword(credentialsId: 'docker-hub-token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sh """
               echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-              docker push ${BACKEND_IMAGE}
+              docker push ${backendImage}
               docker push ${DOCKER_IMAGE_BACKEND}:latest
-              docker push ${FRONTEND_IMAGE}
+              docker push ${frontendImage}
               docker push ${DOCKER_IMAGE_FRONTEND}:latest
             """
           }
@@ -119,7 +97,7 @@ pipeline {
       }
     }
 
-    stage('Docker Up') {
+    stage('Local Docker Compose Up') {
       steps {
         sh "docker-compose -f docker/docker-compose.yml up -d"
       }
@@ -142,16 +120,13 @@ pipeline {
 
   post {
     always {
-      sh """
-        docker rmi ${BACKEND_IMAGE} || true
-        docker rmi ${FRONTEND_IMAGE} || true
-      """
+      sh "docker system prune -f || true"
     }
     success {
-      echo 'Pipeline erfolgreich abgeschlossen'
+      echo 'Jenkins-Build erfolgreich abgeschlossen.'
     }
     failure {
-      echo 'Pipeline fehlgeschlagen'
+      echo 'Jenkins-Build fehlgeschlagen.'
     }
     cleanup {
       cleanWs()
