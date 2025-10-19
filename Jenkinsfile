@@ -1,7 +1,6 @@
 pipeline {
   agent any
 
-  // Parameter für manuelle Steuerung beim Start des Builds
   parameters {
     choice(
       name: 'ENVIRONMENT',
@@ -20,7 +19,6 @@ pipeline {
     )
   }
 
-  // Globale Umgebungsvariablen für Bildnamen
   environment {
     DOCKER_USERNAME = 'andziallas'
     DOCKER_IMAGE_BACKEND = "${DOCKER_USERNAME}/kukuk-backend"
@@ -29,14 +27,12 @@ pipeline {
 
   stages {
 
-    // Git-Checkout des Projekts
     stage('Checkout') {
       steps {
         checkout scm
       }
     }
 
-    // Backend kompilieren (Spring Boot)
     stage('Build Backend') {
       steps {
         dir('backend') {
@@ -45,7 +41,6 @@ pipeline {
       }
     }
 
-    // Frontend bauen (React oder ähnliches)
     stage('Build Frontend') {
       steps {
         dir('frontend') {
@@ -55,7 +50,6 @@ pipeline {
       }
     }
 
-    // Backend-Tests ausführen (optional)
     stage('Test Backend') {
       when {
         expression { return !params.SKIP_TESTS }
@@ -67,7 +61,6 @@ pipeline {
       }
     }
 
-    // Frontend-Tests ausführen (optional, Fehler werden ignoriert)
     stage('Test Frontend') {
       when {
         expression { return !params.SKIP_TESTS }
@@ -79,7 +72,6 @@ pipeline {
       }
     }
 
-    // Docker-Login, Build und Push zu Docker Hub
     stage('Docker Build and Push') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'DOCKER_HUB_TOKEN', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -92,7 +84,35 @@ pipeline {
       }
     }
 
-    // Docker Compose Umgebung starten (Datei liegt im Hauptverzeichnis)
     stage('Docker Compose Up') {
       steps {
         sh '''
+          if command -v docker compose > /dev/null; then
+            docker compose -f docker-compose.yaml down || true
+            docker compose -f docker-compose.yaml up -d
+          elif command -v docker-compose > /dev/null; then
+            docker-compose -f docker-compose.yaml down || true
+            docker-compose -f docker-compose.yaml up -d
+          else
+            echo "Weder 'docker compose' noch 'docker-compose' verfügbar"
+            exit 1
+          fi
+        '''
+      }
+    }
+
+    stage('Health Check') {
+      steps {
+        sh '''
+          for i in {1..5}; do
+            curl -sSf http://localhost:3000 && break || sleep 2
+          done || echo "Frontend nicht erreichbar"
+
+          for i in {1..5}; do
+            curl -sSf http://localhost:8080/api/health && break || sleep 2
+          done || echo "Backend nicht erreichbar"
+        '''
+      }
+    }
+  }
+}
