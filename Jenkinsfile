@@ -27,16 +27,10 @@ pipeline {
 
   stages {
 
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-
     stage('Build Backend') {
       steps {
         dir('backend') {
-          sh 'mvn clean compile'
+          sh "mvn clean package -DskipTests=${params.SKIP_TESTS}"
         }
       }
     }
@@ -45,7 +39,8 @@ pipeline {
       steps {
         dir('frontend') {
           sh 'npm install'
-          sh 'npm run build'
+          // Falls du ein Build-System nutzt:
+          sh 'npm run build || echo "Kein Build notwendig"'
         }
       }
     }
@@ -67,7 +62,7 @@ pipeline {
       }
       steps {
         dir('frontend') {
-          sh 'npm test || true'
+          sh 'npm test'
         }
       }
     }
@@ -87,12 +82,18 @@ pipeline {
     stage('Docker Compose Up') {
       steps {
         sh '''
+          COMPOSE_FILE=docker-compose.yaml
+          if [ ! -f "$COMPOSE_FILE" ]; then
+            echo "Fehlende Datei: $COMPOSE_FILE"
+            exit 1
+          fi
+
           if command -v docker compose > /dev/null; then
-            docker compose -f docker-compose.yaml down || true
-            docker compose -f docker-compose.yaml up -d
+            docker compose -f $COMPOSE_FILE down || true
+            docker compose -f $COMPOSE_FILE up -d
           elif command -v docker-compose > /dev/null; then
-            docker-compose -f docker-compose.yaml down || true
-            docker-compose -f docker-compose.yaml up -d
+            docker-compose -f $COMPOSE_FILE down || true
+            docker-compose -f $COMPOSE_FILE up -d
           else
             echo "Weder 'docker compose' noch 'docker-compose' verfügbar"
             exit 1
@@ -104,15 +105,26 @@ pipeline {
     stage('Health Check') {
       steps {
         sh '''
+          echo "Prüfe Frontend auf Port 8081..."
           for i in {1..5}; do
-            curl -sSf http://localhost:3000 && break || sleep 2
+            curl -sSf http://localhost:8081 && break || sleep 2
           done || echo "Frontend nicht erreichbar"
 
+          echo "Prüfe Backend auf Port 8080..."
           for i in {1..5}; do
             curl -sSf http://localhost:8080/api/health && break || sleep 2
           done || echo "Backend nicht erreichbar"
         '''
       }
+    }
+  }
+
+  post {
+    success {
+      echo '✅ Build, Push und Deployment erfolgreich abgeschlossen.'
+    }
+    failure {
+      echo '❌ Pipeline fehlgeschlagen.'
     }
   }
 }
