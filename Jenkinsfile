@@ -142,10 +142,10 @@ pipeline {
         script {
           sh """
             echo 'Checking frontend...'
-            curl -sSf http://localhost:3000 || echo '❌ Frontend nicht erreichbar'
+            curl -sSf http://localhost:3000 || echo 'Frontend nicht erreichbar'
 
             echo 'Checking backend...'
-            curl -sSf http://localhost:8080/api/health || echo '❌ Backend nicht erreichbar'
+            curl -sSf http://localhost:8080/api/health || echo 'Backend nicht erreichbar'
           """
         }
       }
@@ -160,10 +160,10 @@ pipeline {
       """
     }
     success {
-      echo '✅ Pipeline erfolgreich abgeschlossen!'
+      echo 'Pipeline erfolgreich abgeschlossen!'
     }
     failure {
-      echo '❌ Pipeline fehlgeschlagen!'
+      echo 'Pipeline fehlgeschlagen!'
     }
     cleanup {
       cleanWs()
