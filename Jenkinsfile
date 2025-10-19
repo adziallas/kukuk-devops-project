@@ -86,16 +86,16 @@ pipeline {
     stage('Docker Compose Up') {
       steps {
         dir('docker') {
-          sh 'docker-compose down || true'
-          sh 'docker-compose up -d'
+          sh 'docker compose down || true'
+          sh 'docker compose up -d'
         }
       }
     }
 
     stage('Health Check') {
       steps {
-        sh 'curl -sSf http://localhost:3000 || echo "⚠️ Frontend nicht erreichbar"'
-        sh 'curl -sSf http://localhost:8080/api/health || echo "⚠️ Backend nicht erreichbar"'
+        sh 'curl -sSf http://localhost:3000 || echo "Frontend nicht erreichbar"'
+        sh 'curl -sSf http://localhost:8080/api/health || echo "Backend nicht erreichbar"'
       }
     }
   }
