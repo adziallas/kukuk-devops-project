@@ -68,12 +68,6 @@ pipeline {
             }
         }
 
-        stage('Configure Minikube Docker') {
-            steps {
-                sh 'eval $(minikube docker-env)'
-            }
-        }
-
         stage('Docker Build') {
             parallel {
                 stage('Backend Image') {
