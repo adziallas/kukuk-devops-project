@@ -66,7 +66,7 @@ pipeline {
       }
       steps {
         dir('frontend') {
-          sh 'npm test || true' // Fehler ignorieren, falls kein Test-Setup vorhanden
+          sh 'npm test || true'
         }
       }
     }
