@@ -39,7 +39,6 @@ pipeline {
       steps {
         dir('frontend') {
           sh 'npm install'
-          // Falls du ein Build-System nutzt:
           sh 'npm run build || echo "Kein Build notwendig"'
         }
       }
@@ -76,6 +75,20 @@ pipeline {
           sh 'docker push $DOCKER_IMAGE_BACKEND:latest'
           sh 'docker push $DOCKER_IMAGE_FRONTEND:latest'
         }
+      }
+    }
+
+    stage('Docker Port Cleanup') {
+      steps {
+        echo '🔧 Bereinige blockierte Ports 8080 und 8081...'
+        sh '''
+          docker ps --format '{{.ID}} {{.Ports}}' | while read id ports; do
+            if echo "$ports" | grep -q '8080\\|8081'; then
+              echo "Stoppe Container $id mit Ports: $ports"
+              docker stop $id || true
+            fi
+          done
+        '''
       }
     }
 
