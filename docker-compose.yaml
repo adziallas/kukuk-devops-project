@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  backend:
+    image: andziallas/kukuk-backend:latest
+    ports:
+      - "8080:8080"
+
+  frontend:
+    image: andziallas/kukuk-frontend:latest
+    ports:
+      - "3000:3000"
