@@ -82,10 +82,12 @@ pipeline {
       steps {
         sh '''
           echo "Prüfe Systemprozesse auf Port 8080..."
-          PID=$(lsof -ti :8080)
+          PID=$(lsof -ti :8080 || true)
           if [ -n "$PID" ]; then
             echo "Beende Prozess $PID auf Port 8080"
             kill -9 $PID || true
+          else
+            echo "Kein Prozess auf Port 8080 gefunden"
           fi
         '''
       }
