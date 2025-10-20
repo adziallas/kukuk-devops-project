@@ -244,9 +244,6 @@ kubectl apply -f k8s/frontend-service.yaml
  **Docker**: Multi-stage Builds für Backend und Frontend  
  **Dokumentation**: Umfassende README mit allen Konfigurationsdetails  
 
----
 
-**Entwickelt für Kukuk Technology Future GmbH**  
-**DevOps Engineering Abschlussprojekt**  
-**Datum**: Oktober 2025
+
 
